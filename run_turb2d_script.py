@@ -4,9 +4,9 @@
 import requests
 import json
 
-slack_user_id = 'U01TDH86N4V'#プロフィールのメンバーIDをコピペ
-slack_webhook_url = 'https://hooks.slack.com/services/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'
 def slack_notify(msg = 'done'):
+    slack_user_id = 'U01TDH86N4V'#プロフィールのメンバーIDをコピペ
+    slack_webhook_url = 'https://hooks.slack.com/services/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'
     requests.post(slack_webhook_url, json={"text":msg})
     print(msg)
 
@@ -84,23 +84,23 @@ create_init_flow_region(
 # making turbidity current object
 tc = TurbidityCurrent2D(
     grid,
-    Cf=0.044,
+    Cf=0.39,
     R=1.0,
-    alpha=0.4,
+    alpha=0.2,
     kappa=0.05,
     nu_a=0.75,
     Ds=80 * 10**-6,
     h_init=0.0,
     Ch_w=10**(-5),
-    h_w=0.01,
+    h_w=0.1,
     C_init=0.0,
     implicit_num=100,
-    implicit_threshold=1.0 * 10**-12,
+    implicit_threshold=1.0 * 10**-8,
     r0=1.5,
     water_entrainment=False,
     suspension=False,
     dflow=True,
-    tan_delta=0.3,
+    tan_delta=0.30,
 )
 
 # start calculation
@@ -108,8 +108,10 @@ t = time.time()
 tc.save_nc('tc{:04d}.nc'.format(0))
 last = 100
 
+#import pdb; pdb.set_trace() 
+
 for i in tqdm(range(1, last + 1), disable=False):
-    tc.run_one_step(dt=50)
+    tc.run_one_step(dt=1.0)
     tc.save_nc('tc{:04d}.nc'.format(i))
 
 tc.save_grid('tc{:04d}.nc'.format(i))

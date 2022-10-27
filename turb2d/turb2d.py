@@ -683,8 +683,8 @@ class TurbidityCurrent2D(Component):
             # calculate advection terms using cip method
             self._advection_phase()
 
-            # # apply the shock dissipation scheme
-            #self._shock_dissipation_phase()
+            # apply the shock dissipation scheme
+            self._shock_dissipation_phase()
 
             #the end of the loop of one local time step
             self.first_step = False
@@ -1041,17 +1041,37 @@ class TurbidityCurrent2D(Component):
             map_values(self, Cf_link=self.Cf_link, Cf_node=self.Cf_node)
 
         # calculate friction terms using semi-implicit scheme
+        u_ini= self.u_temp[self.wet_horizontal_links]
+        v_ini= self.v_temp[self.wet_horizontal_links]
         if self.dflow:
             self.u_temp[self.wet_horizontal_links] = (self.u_temp[self.wet_horizontal_links] - np.sign(self.u_temp[self.wet_horizontal_links]) * self.g * self.dt_local * np.cos(self.S[
                     self.wet_horizontal_links]) * self.tan_delta) / (
                 1 + (self.Cf_link[self.wet_horizontal_links]) *
                 self.U[self.wet_horizontal_links] * self.dt_local /
                 self.h_link[self.wet_horizontal_links])
+
+
+
             self.v_temp[self.wet_vertical_links] = (self.v_temp[self.wet_vertical_links] - np.sign(self.v_temp[self.wet_vertical_links]) * self.g * self.dt_local * np.cos(self.S[
                     self.wet_vertical_links]) * self.tan_delta) / (
                 1 + (self.Cf_link[self.wet_vertical_links]) *
                 self.U[self.wet_vertical_links] * self.dt_local /
                 self.h_link[self.wet_vertical_links])
+
+            u_new = self.u_temp[self.wet_horizontal_links]
+            v_new = self.v_temp[self.wet_horizontal_links]
+
+            
+
+            for i in range(len(u_new)):
+                if np.sign(u_ini[i])*np.sign(u_new[i]) < 0:
+                    u_new[i] = 0
+            self.u_temp[self.wet_horizontal_links] = u_new
+            for i in range(len(u_new)):
+                if np.sign(v_ini[i])*np.sign(v_new[i]) < 0:
+                    v_new[i] = 0
+            self.v_temp[self.wet_horizontal_links] = v_new
+
             
         else:
             self.u_temp[self.wet_horizontal_links] /= (
