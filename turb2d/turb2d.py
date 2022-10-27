@@ -1058,20 +1058,18 @@ class TurbidityCurrent2D(Component):
                 self.U[self.wet_vertical_links] * self.dt_local /
                 self.h_link[self.wet_vertical_links])
 
-            u_new = self.u_temp[self.wet_horizontal_links]
-            v_new = self.v_temp[self.wet_horizontal_links]
-
             
 
-            for i in range(len(u_new)):
-                if np.sign(u_ini[i])*np.sign(u_new[i]) < 0:
-                    u_new[i] = 0
-            self.u_temp[self.wet_horizontal_links] = u_new
-            for i in range(len(u_new)):
-                if np.sign(v_ini[i])*np.sign(v_new[i]) < 0:
-                    v_new[i] = 0
-            self.v_temp[self.wet_horizontal_links] = v_new
-
+            self.u_temp[self.wet_horizontal_links] = np.where(
+                np.sign(u_ini[i])*np.sign(self.u_temp[self.wet_horizontal_links])<0,
+                0,
+                self.u_temp[self.wet_horizontal_links]
+                )
+            
+            self.v_temp[self.wet_horizontal_links] = np.where(
+                np.sign(v_ini[i])*np.sign(self.v_temp[self.wet_vertical_links])<0,
+                0,
+                self.v_temp[self.wet_vertical_links])
             
         else:
             self.u_temp[self.wet_horizontal_links] /= (

@@ -4,6 +4,7 @@
 import requests
 import json
 
+
 def slack_notify(msg = 'done'):
     slack_user_id = 'U01TDH86N4V'#プロフィールのメンバーIDをコピペ
     slack_webhook_url = 'https://hooks.slack.com/services/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'
@@ -106,14 +107,18 @@ tc = TurbidityCurrent2D(
 # start calculation
 t = time.time()
 tc.save_nc('tc{:04d}.nc'.format(0))
-last = 100
-
+last = 10
+save_dir = "ncfile"
+os.makedirs(save_dir, exist_ok=True)
 #import pdb; pdb.set_trace() 
 
 for i in tqdm(range(1, last + 1), disable=False):
     tc.run_one_step(dt=1.0)
-    tc.save_nc('tc{:04d}.nc'.format(i))
+    tc.save_nc('ncfile/tc{:04d}.nc'.format(i))
 
-tc.save_grid('tc{:04d}.nc'.format(i))
+tc.save_grid('ncfile/tc{:04d}.nc'.format(i))
+
+
+os.move
 print('elapsed time: {} sec.'.format(time.time() - t))
 slack_notify(msg='終わったよー')
